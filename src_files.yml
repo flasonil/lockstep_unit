@@ -1,0 +1,4 @@
+lockstep_unit:
+  files: [
+    lockstep_unit.sv,
+  ]
