@@ -8,19 +8,20 @@ module lockstep_unit
    input logic                 clk_i,
    input logic                 rst_ni,
    
-   XBAR_PERIPH_BUS.Slave speriph_slave
+   input logic                 req_i,
+   input logic [31:0]          addr_i,
+   input logic                 wen_i,
+   input logic [31:0]          wdata_i,
+   input logic [3:0]           be_i,
+   input logic [ID_WIDTH-1:0]  id_i,
+   output logic                gnt_o,
+    
+   output logic                r_valid_o,
+   output logic                r_opc_o,
+   output logic [ID_WIDTH-1:0] r_id_o,
+   output logic [31:0]         r_rdata_o
+   
   );
-
-   logic                       req_i;
-   logic [31:0]                addr_i;
-   logic                       wen_i;
-   logic [31:0]                wdata_i;
-   logic [3:0]                 be_i;
-   logic                       gnt_o;
-   logic                       r_valid_o;
-   logic                       r_opc_o;
-   logic [ID_width-1:0]        id_i_o;
-   logic [31:0]                r_rdata_o;
    
    logic                  s_req,s_wen;
    logic [31:0]           s_addr;
@@ -28,18 +29,6 @@ module lockstep_unit
    logic [31:0]           lockstep_ctrl, lockstep_ctrl_reg;    
       
    enum                   logic [1:0] {TRANS_IDLE,TRANS_RUN} CS, NS;
-
-   assign speriph_slave.gnt = gnt_o;
-   assign req_i = speriph_slave.req;
-   assign addr_i = speriph_slave.addr;
-   assign wen_i = speriph_slave.wen;
-   assign wdata_i = speriph_slave.wdata;
-   assign be_i = speriph_slave.be;
-   assign id_i = speriph_slave.id;
-   assign speriph_slave.r_valid = r_valid_o;
-   assign speriph_slave.r_opc = r_opc_o;
-   assign speriph_slave.r_id = r_id_o;
-   assign speriph_slave.r_rdata = r_rdata_o;
    
    always_ff @(posedge clk_i, negedge  rst_ni)
      begin
