@@ -1,4 +1,4 @@
-`define LOCKSTEP_ADDRESS 32'h10202800
+`define LOCKSTEP_ADDRESS 32'h10202400
 
 module lockstep_unit
   #(
@@ -19,17 +19,20 @@ module lockstep_unit
     output logic                r_valid_o,
     output logic                r_opc_o,
     output logic [ID_WIDTH-1:0] r_id_o,
-    output logic [31:0]         r_rdata_o
+    output logic [31:0]         r_rdata_o,
+    output logic                lockstep_mode,
+	input logic [7:0] barrier_matched        
     );
 
    logic                        s_req,s_wen;
    logic [31:0]                 s_addr;
    
-   logic [31:0]                 lockstep_ctrl, lockstep_ctrl_reg;    
+   logic [31:0]                 lockstep_ctrl,lockstep_ctrl_reg,lck;    
       
    enum                         logic [1:0] {TRANS_IDLE,TRANS_RUN} CS, NS;
 	
    assign r_opc_o = 1'b0;
+   assign lockstep_mode = lck[0];
 
    always_ff @(posedge clk_i, negedge  rst_ni)
      begin
@@ -75,12 +78,14 @@ module lockstep_unit
 		     s_addr <= 32'h00000000;
 		     r_id_o <= 5'b00000;
 		     lockstep_ctrl_reg <= 32'h00000000;
+			 lck <= 32'h00000000;
 	    end else begin
 		     s_req <= req_i;
 		     s_wen <= wen_i;
 		     s_addr <= addr_i;
 		     r_id_o <= id_i;
 		     lockstep_ctrl_reg <= lockstep_ctrl;
+			 if(barrier_matched == 8'h01) lck <= lockstep_ctrl_reg;
 	    end
    end
 
@@ -101,4 +106,3 @@ module lockstep_unit
 
 
 endmodule // lockstep_unit
-
